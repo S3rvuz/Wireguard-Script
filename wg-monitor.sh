@@ -22,7 +22,7 @@ PEERS["10.10.10.10"]="Test10"
 PEERS["10.10.10.11"]="Marvin Tablet"
 
 echo " "
-echo -e  "${RED}[WireGuard Status]${NC} $NAME"
+echo -e  "${RED}[WireGuard Status]${NC}"
 echo "------------------------------------------------------"
 
 sudo wg show "$WG_IF" dump | tail -n +2 | while IFS=$'\t' read -r public_key preshared_key endpoint allowed_ips latest_handshake transfer_rx transfer_tx persistent_keepalive
@@ -30,13 +30,15 @@ do
     IP=$(echo "$allowed_ips" | cut -d'/' -f1)
     NAME=${PEERS[$IP]:-"Unbekannt"}
 
-    if [ "$latest_handshake" -eq 0 ]; then
-    echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - noch kein Handshake"
+if [ "$latest_handshake" -eq 0 ]; then
+    RX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_rx")
+    TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
+
+    echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - noch kein Handshake | gesendet: $RX_TEXT | erhalten: $TX_TEXT"
     echo "-------------------------------------------------"
     echo
     continue
 fi
-
     AGE=$((NOW - latest_handshake))
 
     if [ "$AGE" -lt 300 ]; then
@@ -50,21 +52,29 @@ fi
 
     if [ "$AGE" -lt 60 ]; then
         AGE_TEXT="${AGE}s"
+	RX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_rx")
+	TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
+
     elif [ "$AGE" -lt 3600 ]; then
         AGE_TEXT="$((AGE / 60))min"
+	RX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_rx")
+	TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
+
     elif [ "$AGE" -lt 86400 ]; then
         AGE_TEXT="$((AGE / 3600))h"
+	RX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_rx")
+	TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
     else
         AGE_TEXT="$((AGE / 86400))d"
-    fi
 
-    if [ "$STATUS" = "OK" ]; then
-    echo -e "${GREEN}[OK]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT"
+    fi
+if [ "$STATUS" = "OK" ]; then
+    echo -e "${GREEN}[OK]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT | gesendet: $RX_TEXT | erhalten: $TX_TEXT"
 elif [ "$STATUS" = "WARN" ]; then
-    echo -e "${YELLOW}[WARN]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT"
+    echo -e "${YELLOW}[WARN]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT | gesendet: $RX_TEXT | erhalten: $TX_TEXT"
 else
-    echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT"
-fi 
+    echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT | gesendet: $RX_TEXT | erhalten: $TX_TEXT"
+fi
     echo "----------------------------------------------------- "
     echo " "
 
