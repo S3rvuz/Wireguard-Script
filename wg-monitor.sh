@@ -31,11 +31,11 @@ do
     NAME=${PEERS[$IP]:-"Unbekannt"}
 
     if [ "$latest_handshake" -eq 0 ]; then
-        echo "[OFFLINE] $NAME ($IP) - noch kein Handshake"
-	echo "------------------------------------------------- "
-	echo " "
-        continue
-    fi
+    echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - noch kein Handshake"
+    echo "-------------------------------------------------"
+    echo
+    continue
+fi
 
     AGE=$((NOW - latest_handshake))
 
