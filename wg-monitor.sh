@@ -1,5 +1,11 @@
 #!/bin/bash
 
+TOTAL=0
+OK_COUNT=0
+WARN_COUNT=0
+OFFLINE_COUNT=0
+NEVER_COUNT=0
+
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -35,7 +41,7 @@ if [ "$latest_handshake" -eq 0 ]; then
     TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
 
     echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - noch kein Handshake | gesendet: $RX_TEXT | erhalten: $TX_TEXT"
-    echo "-------------------------------------------------"
+    echo "---------------------------------------------------"
     echo
     continue
 fi
@@ -70,6 +76,6 @@ else
     echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT | gesendet: $RX_TEXT | erhalten: $TX_TEXT"
 fi
 
-echo "----------------------------------------------------- "
+echo "---------------------------------------------------------- "
 echo
 done
