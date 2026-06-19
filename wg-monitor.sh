@@ -1,5 +1,11 @@
 #!/bin/bash
 
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
 WG_IF="wg0"
 NOW=$(date +%s)
 
@@ -37,6 +43,7 @@ do
         STATUS="OK"
     elif [ "$AGE" -lt 3600 ]; then
         STATUS="WARN"
+
     else
         STATUS="OFFLINE"
     fi
@@ -51,7 +58,13 @@ do
         AGE_TEXT="$((AGE / 86400))d"
     fi
 
-    echo "[$STATUS] $NAME ($IP) - letzter Handshake vor $AGE_TEXT" 
+    if [ "$STATUS" = "OK" ]; then
+    echo -e "${GREEN}[OK]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT"
+elif [ "$STATUS" = "WARN" ]; then
+    echo -e "${YELLOW}[WARN]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT"
+else
+    echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT"
+fi 
     echo "----------------------------------------------------- "
     echo " "
 
