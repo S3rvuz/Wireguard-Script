@@ -22,7 +22,7 @@ PEERS["10.10.10.10"]="Test10"
 PEERS["10.10.10.11"]="Marvin Tablet"
 
 echo " "
-echo "WireGuard Status"
+echo "${RED}[WireGuard Status]${NC} $NAME"
 echo "------------------------------------------------------"
 
 sudo wg show "$WG_IF" dump | tail -n +2 | while IFS=$'\t' read -r public_key preshared_key endpoint allowed_ips latest_handshake transfer_rx transfer_tx persistent_keepalive
