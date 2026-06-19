@@ -38,6 +38,11 @@ while IFS=$'\t' read -r public_key preshared_key endpoint allowed_ips latest_han
 do
     IP=$(echo "$allowed_ips" | cut -d'/' -f1)
     NAME=${PEERS[$IP]:-"Unbekannt"}
+if ping -c 1 -W 1 "$IP" > /dev/null 2>&1; then
+    PING_STATUS="${GREEN}OK${NC}"
+else
+    PING_STATUS="${RED}FAIL${NC}"
+fi
 
     TOTAL=$((TOTAL + 1))
     TOTAL_RX=$((TOTAL_RX + transfer_rx))
@@ -97,6 +102,7 @@ ${GREEN}[OK]${NC} $NAME
 VPN-IP: $IP
 Endpoint: $ENDPOINT_TEXT
 Handshake: vor $AGE_TEXT
+VPN-Ping: $PING_STATUS
 Traffic: gesendet: $RX_TEXT | erhalten: $TX_TEXT
 ----------------------------------------------------------
 EOF
@@ -109,6 +115,7 @@ ${YELLOW}[WARN]${NC} $NAME
 VPN-IP: $IP
 Endpoint: $ENDPOINT_TEXT
 Handshake: vor $AGE_TEXT
+VPN-Ping: $PING_STATUS
 Traffic: gesendet: $RX_TEXT | erhalten: $TX_TEXT
 ----------------------------------------------------------
 EOF
