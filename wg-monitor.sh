@@ -39,35 +39,29 @@ if [ "$latest_handshake" -eq 0 ]; then
     echo
     continue
 fi
-    AGE=$((NOW - latest_handshake))
+AGE=$((NOW - latest_handshake))
 
-    if [ "$AGE" -lt 300 ]; then
-        STATUS="OK"
-    elif [ "$AGE" -lt 3600 ]; then
-        STATUS="WARN"
+RX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_rx")
+TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
 
-    else
-        STATUS="OFFLINE"
-    fi
+if [ "$AGE" -lt 300 ]; then
+    STATUS="OK"
+elif [ "$AGE" -lt 3600 ]; then
+    STATUS="WARN"
+else
+    STATUS="OFFLINE"
+fi
 
-    if [ "$AGE" -lt 60 ]; then
-        AGE_TEXT="${AGE}s"
-	RX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_rx")
-	TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
+if [ "$AGE" -lt 60 ]; then
+    AGE_TEXT="${AGE}s"
+elif [ "$AGE" -lt 3600 ]; then
+    AGE_TEXT="$((AGE / 60))min"
+elif [ "$AGE" -lt 86400 ]; then
+    AGE_TEXT="$((AGE / 3600))h"
+else
+    AGE_TEXT="$((AGE / 86400))d"
+fi
 
-    elif [ "$AGE" -lt 3600 ]; then
-        AGE_TEXT="$((AGE / 60))min"
-	RX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_rx")
-	TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
-
-    elif [ "$AGE" -lt 86400 ]; then
-        AGE_TEXT="$((AGE / 3600))h"
-	RX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_rx")
-	TX_TEXT=$(numfmt --to=iec --suffix=B "$transfer_tx")
-    else
-        AGE_TEXT="$((AGE / 86400))d"
-
-    fi
 if [ "$STATUS" = "OK" ]; then
     echo -e "${GREEN}[OK]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT | gesendet: $RX_TEXT | erhalten: $TX_TEXT"
 elif [ "$STATUS" = "WARN" ]; then
@@ -75,7 +69,7 @@ elif [ "$STATUS" = "WARN" ]; then
 else
     echo -e "${RED}[OFFLINE]${NC} $NAME ($IP) - letzter Handshake vor $AGE_TEXT | gesendet: $RX_TEXT | erhalten: $TX_TEXT"
 fi
-    echo "----------------------------------------------------- "
-    echo " "
 
+echo "----------------------------------------------------- "
+echo
 done
